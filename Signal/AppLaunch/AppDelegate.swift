@@ -62,6 +62,12 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 
         appReadiness.runNowOrWhenAppDidBecomeReadySync { self.handleActivation() }
 
+        // Deliver any scheduled messages whose fire date has passed while we
+        // were backgrounded (in case a background wake didn't run).
+        appReadiness.runNowOrWhenAppDidBecomeReadyAsync {
+            Task { await DependenciesBridge.shared.scheduledMessageManager.sendAllDue() }
+        }
+
         // Clear all notifications whenever we become active.
         // When opening the app from a notification,
         // AppDelegate.didReceiveLocalNotification will always
@@ -302,11 +308,26 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         )
         databaseMigratorRunner.registerBGProcessingTask(appReadiness: appReadiness)
 
+        let scheduledMessageRunner = ScheduledMessageBGProcessingTaskRunner(
+            backgroundMessageFetcherFactory: { DependenciesBridge.shared.backgroundMessageFetcherFactory },
+            db: databaseStorage,
+            scheduledMessageManager: { DependenciesBridge.shared.scheduledMessageManager },
+            store: { ScheduledMessageStoreImpl() },
+        )
+        
+        scheduledMessageRunner.registerBGProcessingTask(appReadiness: appReadiness)
+        AppEnvironment.shared.scheduledMessageBGTaskRunner = scheduledMessageRunner
+
         appReadiness.runNowOrWhenAppDidBecomeReadyAsync {
             Task {
                 await attachmentValidationRunner.scheduleBGProcessingTaskIfNeeded()
                 await backupRunner.scheduleBGProcessingTaskIfNeeded()
                 await databaseMigratorRunner.scheduleBGProcessingTaskIfNeeded()
+                await scheduledMessageRunner.scheduleBGProcessingTaskIfNeeded()
+
+                // Foreground safety net: deliver any scheduled messages whose
+                // fire date has already passed (e.g. a background wake was missed).
+                await DependenciesBridge.shared.scheduledMessageManager.sendAllDue()
 
 #if targetEnvironment(simulator)
                 // The simulator won't run BGProcessingTasks, but we still want to run
