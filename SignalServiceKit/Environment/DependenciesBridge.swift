@@ -168,6 +168,7 @@ public class DependenciesBridge {
     public let registrationSessionManager: RegistrationSessionManager
     public let registrationStateChangeManager: RegistrationStateChangeManager
     public let remoteReleaseNotesService: any RemoteReleaseNotesServiceProtocol
+    public let scheduledMessageManager: ScheduledMessageManager
     public let searchableNameIndexer: SearchableNameIndexer
     let senderKeySendingManager: SenderKeySendingManager
     public let sentMessageTranscriptReceiver: SentMessageTranscriptReceiver
@@ -316,6 +317,7 @@ public class DependenciesBridge {
         registrationSessionManager: RegistrationSessionManager,
         registrationStateChangeManager: RegistrationStateChangeManager,
         remoteReleaseNotesService: any RemoteReleaseNotesServiceProtocol,
+        scheduledMessageManager: ScheduledMessageManager,
         searchableNameIndexer: SearchableNameIndexer,
         senderKeySendingManager: SenderKeySendingManager,
         sentMessageTranscriptReceiver: SentMessageTranscriptReceiver,
@@ -463,6 +465,7 @@ public class DependenciesBridge {
         self.registrationSessionManager = registrationSessionManager
         self.registrationStateChangeManager = registrationStateChangeManager
         self.remoteReleaseNotesService = remoteReleaseNotesService
+        self.scheduledMessageManager = scheduledMessageManager
         self.searchableNameIndexer = searchableNameIndexer
         self.senderKeySendingManager = senderKeySendingManager
         self.sentMessageTranscriptReceiver = sentMessageTranscriptReceiver
