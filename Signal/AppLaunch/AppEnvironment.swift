@@ -22,6 +22,7 @@ public class AppEnvironment: NSObject {
     @MainActor
     var ownedObjects = [AnyObject]()
 
+    let appReadiness: AppReadiness
     let cvAudioPlayerRef: CVAudioPlayer
     let deviceTransferServiceRef: DeviceTransferService
     let pushRegistrationManagerRef: PushRegistrationManager
@@ -46,7 +47,12 @@ public class AppEnvironment: NSObject {
     private(set) var quickRestoreManager: QuickRestoreManager!
     private var registrationIdMismatchManager: RegistrationIdMismatchManager!
 
+    /// Set up in `AppDelegate` alongside the other background task runners.
+    /// Used by the "schedule message" App Intent to (re)schedule delivery.
+    var scheduledMessageBGTaskRunner: ScheduledMessageBGProcessingTaskRunner?
+
     init(appReadiness: AppReadiness, deviceTransferService: DeviceTransferService) {
+        self.appReadiness = appReadiness
         self.cvAudioPlayerRef = CVAudioPlayer()
         self.deviceTransferServiceRef = deviceTransferService
         self.screenLockUI = ScreenLockUI(appReadiness: appReadiness)
