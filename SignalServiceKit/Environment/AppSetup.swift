@@ -1722,6 +1722,15 @@ extension AppSetup.GlobalsContinuation {
 
         let remoteReleaseNotesService = RemoteReleaseNotesService(signalService: signalService)
 
+        let scheduledMessageManager = ScheduledMessageManagerImpl(
+            attachmentContentValidator: attachmentContentValidator,
+            dateProvider: dateProvider,
+            db: db,
+            disappearingMessagesConfigurationStore: disappearingMessagesConfigurationStore,
+            messageSenderJobQueue: messageSenderJobQueue,
+            store: ScheduledMessageStoreImpl()
+        )
+
         let dependenciesBridge = DependenciesBridge(
             accountAttributesUpdater: accountAttributesUpdater,
             accountEntropyPoolManager: accountEntropyPoolManager,
@@ -1844,6 +1853,7 @@ extension AppSetup.GlobalsContinuation {
             registrationSessionManager: registrationSessionManager,
             registrationStateChangeManager: registrationStateChangeManager,
             remoteReleaseNotesService: remoteReleaseNotesService,
+            scheduledMessageManager: scheduledMessageManager,
             searchableNameIndexer: searchableNameIndexer,
             senderKeySendingManager: senderKeySendingManager,
             sentMessageTranscriptReceiver: sentMessageTranscriptReceiver,
